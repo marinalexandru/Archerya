@@ -5,7 +5,7 @@ using UnityEngine;
 public class ProjectileScript : MonoBehaviour
 {
 
-    public Transform ProjectileTarget;
+    public GameObject ProjectileTarget;
     public float Speed = 0;
 
     // Use this for initialization

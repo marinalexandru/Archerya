@@ -12,6 +12,9 @@ public class EnemyController : MonoBehaviour
     public float range = 5.0f;
 	[HeaderAttribute("Agro:")]
     public float agroRange = 10.0f;
+    [HeaderAttribute("3DParts")]
+    public GameObject weapon;
+    public GameObject hitZone;
     private GameObject target;
     private UnityEngine.AI.NavMeshAgent agent;
     // Use this for initialization

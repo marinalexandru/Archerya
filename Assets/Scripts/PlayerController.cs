@@ -9,10 +9,14 @@ public class PlayerController : MonoBehaviour
     public float baseAttackSpeed = 1.0f; // attacks per second 
     public float range = 5.0f;
     public GameObject projectile;
+
+    [HeaderAttribute("3DParts")]
+    public GameObject weapon;
+    public GameObject hitZone;
     private UnityEngine.AI.NavMeshAgent agent;
     private Camera camera;
-    private Transform friendlyTarget;
-    private Transform enemyTarget;
+    private GameObject friendlyTarget;
+    private GameObject enemyTarget;
     private List<Collider> enemies;
 
     /// <summary>
@@ -63,11 +67,11 @@ public class PlayerController : MonoBehaviour
         switch (hit.transform.gameObject.tag)
         {
             case "Enemy":
-                enemyTarget = hit.transform;
+                enemyTarget = hit.transform.gameObject;
                 friendlyTarget = null;
                 break;
             case "Friend":
-                friendlyTarget = hit.transform;
+                friendlyTarget = hit.transform.gameObject;
                 enemyTarget = null;
                 break;
             default:
@@ -140,8 +144,10 @@ public class PlayerController : MonoBehaviour
         {
             if (enemyTarget != null)
             {
-                Instantiate(projectile, this.transform.position, transform.rotation);
-                projectile.GetComponent<ProjectileScript>().ProjectileTarget = enemyTarget;
+                Instantiate(projectile, weapon.transform.position, weapon.transform.rotation);
+                ProjectileScript projectileScript = projectile.GetComponent<ProjectileScript>();
+                EnemyController enemyController = enemyTarget.gameObject.GetComponent<EnemyController>();
+                projectileScript.ProjectileTarget = enemyController.hitZone;
                 projectile.GetComponent<ProjectileScript>().Speed = 30;
             }
             yield return new WaitForSeconds(1/baseAttackSpeed);
