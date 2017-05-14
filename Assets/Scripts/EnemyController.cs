@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyController : GameCombatantUnit
+public class EnemyController : GameCombatantController
 {
     public float FollowAgroRange = 20f;
     private UnityEngine.AI.NavMeshAgent Agent;
@@ -18,7 +15,7 @@ public class EnemyController : GameCombatantUnit
     // Update is called once per frame
     public override void Update()
     {
-        base.Update();
+        // base.Update();
         ShouldFollowAgroedEnemy(); //if in range
     }
 

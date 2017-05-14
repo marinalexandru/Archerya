@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
-public class PlayerController : GameCombatantUnit
+public class PlayerController : GameCombatantController
 {
-
     private UnityEngine.AI.NavMeshAgent Agent;
     private Camera Camera;
     private GameObject FriendlyTarget;

@@ -22,6 +22,10 @@ public class ProjectileScript : MonoBehaviour
             float step = Speed * Time.deltaTime;
             transform.position = Vector3.MoveTowards(transform.position, ProjectileTarget.transform.position, step);
         }
+        else
+        {
+            Destroy(gameObject, 0);
+        }
     }
 
     /// <summary>
@@ -29,7 +33,7 @@ public class ProjectileScript : MonoBehaviour
     /// </summary>
     void Awake()
     {
-        Destroy(gameObject,2);
+        Destroy(gameObject, 2);
     }
 
 }

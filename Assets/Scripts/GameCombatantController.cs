@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public abstract class GameCombatantUnit : MonoBehaviour
+public abstract class GameCombatantController : MonoBehaviour
 {
-
     [HeaderAttribute("3DParts")]
     public GameObject Weapon;
     public GameObject HitZone;
@@ -16,6 +12,9 @@ public abstract class GameCombatantUnit : MonoBehaviour
     private bool AutoAttacking = false;
     protected abstract GameObject GetTarget();
     protected abstract UnityEngine.AI.NavMeshAgent GetAgent();
+    private float timer = 0;
+
+
 
     /// <summary>
     /// Update is called every frame, if the MonoBehaviour is enabled.
@@ -35,7 +34,7 @@ public abstract class GameCombatantUnit : MonoBehaviour
             // stop movement because we can attack
             agent.ResetPath();
             RotateTowardsTarget();
-            AutoAttack(GetTarget());
+            AutoAttack();
         }
         else
         {
@@ -55,36 +54,51 @@ public abstract class GameCombatantUnit : MonoBehaviour
         transform.rotation = stepRotation;
     }
 
-    private void AutoAttack(GameObject enemyTarget)
+    private void AutoAttack()
     {
-        if (AutoAttacking)
-        {
-            return;
-        }
-        StartCoroutine(AutoAttackCoroutine());
-        AutoAttacking = true;
-    }
+        // if (AutoAttacking)
+        // {
+        //     return;
+        // }
+        // StartCoroutine(AutoAttackCoroutine());
+        // AutoAttacking = true;
 
+        timer = timer + Time.deltaTime;
 
-    private IEnumerator AutoAttackCoroutine()
-    {
-        while (true)
+        if (timer > 1 / BaseAttackSpeed)
         {
             if (CanShootTarget())
             {
                 Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
                 ProjectileScript projectileScript = Projectile.GetComponent<ProjectileScript>();
-                GameCombatantUnit gameCombatantController = GetTarget().gameObject.GetComponent<GameCombatantUnit>();
+                GameCombatantController gameCombatantController = GetTarget().gameObject.GetComponent<GameCombatantController>();
                 projectileScript.ProjectileTarget = gameCombatantController.HitZone;
-                Projectile.GetComponent<ProjectileScript>().Speed = 30;
+                Projectile.GetComponent<ProjectileScript>().Speed = 50;
             }
-            else
-            {
-                StopCoroutine(AutoAttackCoroutine());
-            }
-            yield return new WaitForSeconds(1 / BaseAttackSpeed);
+            timer = 0;
         }
     }
+
+
+    // private IEnumerator AutoAttackCoroutine()
+    // {
+    //     while (true)
+    //     {
+    //         if (CanShootTarget())
+    //         {
+    //             Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
+    //             ProjectileScript projectileScript = Projectile.GetComponent<ProjectileScript>();
+    //             GameCombatantController gameCombatantController = GetTarget().gameObject.GetComponent<GameCombatantController>();
+    //             projectileScript.ProjectileTarget = gameCombatantController.HitZone;
+    //             Projectile.GetComponent<ProjectileScript>().Speed = 30;
+    //         }
+    //         else
+    //         {
+    //             StopCoroutine(AutoAttackCoroutine());
+    //         }
+    //         yield return new WaitForSeconds(1 / BaseAttackSpeed);
+    //     }
+    // }
 
     private bool CanShootTarget()
     {
