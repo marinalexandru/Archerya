@@ -90,6 +90,7 @@ public class PlayerController : GameCombatantController
 
     private IEnumerator AggroScanCoroutine()
     {
+        //todo try InvokeRepeating also
         while (true)
         {
 

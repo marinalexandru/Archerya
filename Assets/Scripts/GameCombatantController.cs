@@ -73,6 +73,7 @@ public abstract class GameCombatantController : MonoBehaviour
                 ProjectileScript projectileScript = Projectile.GetComponent<ProjectileScript>();
                 GameCombatantController gameCombatantController = GetTarget().gameObject.GetComponent<GameCombatantController>();
                 projectileScript.ProjectileTarget = gameCombatantController.HitZone;
+                Debug.DrawLine(this.HitZone.transform.position, gameCombatantController.HitZone.transform.position, Color.green,0.25f);                
                 Projectile.GetComponent<ProjectileScript>().Speed = 50;
             }
             timer = 0;

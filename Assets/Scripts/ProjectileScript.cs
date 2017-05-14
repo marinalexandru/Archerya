@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ProjectileScript : MonoBehaviour
 {
@@ -11,7 +9,7 @@ public class ProjectileScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        ProjectileTarget = null;
     }
 
     // Update is called once per frame
