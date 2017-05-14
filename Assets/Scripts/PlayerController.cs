@@ -2,22 +2,17 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : GameCombatantUnit
 {
-    [HeaderAttribute("Attack:")]
-    public float baseAttackSpeed = 1.0f; // attacks per second 
-    public float range = 5.0f;
-    public GameObject projectile;
 
-    [HeaderAttribute("3DParts")]
-    public GameObject weapon;
-    public GameObject hitZone;
-    private UnityEngine.AI.NavMeshAgent agent;
-    private Camera camera;
-    private GameObject friendlyTarget;
-    private GameObject enemyTarget;
-    private List<Collider> enemies;
+    private UnityEngine.AI.NavMeshAgent Agent;
+    private Camera Camera;
+    private GameObject FriendlyTarget;
+    private List<Collider> Enemies;
+    private GameObject Target;
+    private bool agroScanCoroutineStarted = false;
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
@@ -25,27 +20,18 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void Start()
     {
-        camera = Camera.main;
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        enemies = new List<Collider>();
-    }
-
-    /// <summary>
-    /// Callback to draw gizmos only if the object is selected.
-    /// </summary>
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, range);
+        Camera = Camera.main;
+        Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        Enemies = new List<Collider>();
     }
 
     /// <summary>
     /// Update is called every frame, if the MonoBehaviour is enabled.
     /// </summary>
-    void Update()
+    public override void Update()
     {
+        base.Update();
         ShouldUpdateTarget(); //if clicked
-        ShouldAttackEnemy(); //if enemy targeted
         ShouldTalkToFriend(); //if friend targeted
         ShouldGetAggroOfEnemy(); //if enemys are near 
     }
@@ -55,7 +41,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
-            if (Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out hit))
+            if (Physics.Raycast(Camera.ScreenPointToRay(Input.mousePosition), out hit))
             {
                 MarkTargets(hit);
             }
@@ -67,17 +53,17 @@ public class PlayerController : MonoBehaviour
         switch (hit.transform.gameObject.tag)
         {
             case "Enemy":
-                enemyTarget = hit.transform.gameObject;
-                friendlyTarget = null;
+                Target = hit.transform.gameObject;
+                FriendlyTarget = null;
                 break;
             case "Friend":
-                friendlyTarget = hit.transform.gameObject;
-                enemyTarget = null;
+                FriendlyTarget = hit.transform.gameObject;
+                Target = null;
                 break;
             default:
-                enemyTarget = null;
-                friendlyTarget = null;
-                agent.SetDestination(hit.point);
+                Target = null;
+                FriendlyTarget = null;
+                Agent.SetDestination(hit.point);
                 break;
         }
     }
@@ -86,101 +72,57 @@ public class PlayerController : MonoBehaviour
     {
 
     }
-    private void ShouldAttackEnemy()
-    {
-        if (enemyTarget == null)
-        {
-            return;
-        }
-        if (Vector3.Distance(this.transform.position, enemyTarget.transform.position) <= range)
-        {
-            // stop movement because we can attack
-            agent.SetDestination(this.transform.position);
-            AutoAttack();
-        }
-        else
-        {
-            // follow enemy
-            agent.SetDestination(enemyTarget.transform.position);
-        }
-    }
-
-    private void AutoAttack()
-    {
-        //face the enemy
-        // transform.LookAt(enemyTarget); // not interpolated -> bad
-
-        //using quaternions
-        Vector3 distanceVector = enemyTarget.transform.position - transform.position;
-        Quaternion targetRotation = Quaternion.LookRotation(distanceVector);
-        Quaternion stepRotation = Quaternion.Slerp(transform.rotation, targetRotation,
-                            Constants.ANGULAR_LOCK_IN_SPEED * Time.deltaTime);
-        stepRotation.eulerAngles.Set(0, stepRotation.eulerAngles.y, 0);
-        transform.rotation = stepRotation;
-
-        FireProjectile();
-    }
-
-    private bool started = false;
-
-    private void FireProjectile()
-    {
-        if (started)
-        {
-            return;
-        }
-        StartCoroutine(FireProjectileCoroutine());
-        started = true;
-    }
 
     private void ShouldGetAggroOfEnemy()
     {
-        StartCoroutine(AggroScanCoroutine());
-    }
-
-    private IEnumerator FireProjectileCoroutine()
-    {
-        while (true)
+        if (!agroScanCoroutineStarted)
         {
-            if (enemyTarget != null)
-            {
-                Instantiate(projectile, weapon.transform.position, weapon.transform.rotation);
-                ProjectileScript projectileScript = projectile.GetComponent<ProjectileScript>();
-                EnemyController enemyController = enemyTarget.gameObject.GetComponent<EnemyController>();
-                projectileScript.ProjectileTarget = enemyController.hitZone;
-                projectile.GetComponent<ProjectileScript>().Speed = 30;
-            }
-            yield return new WaitForSeconds(1/baseAttackSpeed);
+            StartCoroutine(AggroScanCoroutine());
+            agroScanCoroutineStarted = true;
         }
     }
+
 
     // this is called by an attacking enemy on demise or on flee
     public void OnEnemyDeadOrFlee(Collider collider)
     {
-        enemies.Remove(collider);
-        Debug.Log("Player - Enemy removed from list. Size is: " + enemies.Count);
+        Enemies.Remove(collider);
+        Debug.Log("Player - Enemy removed from list. Size is: " + Enemies.Count);
     }
 
     private IEnumerator AggroScanCoroutine()
     {
-        Collider[] hitColliders = Physics.OverlapSphere(this.transform.position, range);
-
-        int i = 0;
-        while (i < hitColliders.Length)
+        while (true)
         {
-            if (hitColliders[i].tag.Equals("Enemy"))
+
+            Collider[] hitColliders = Physics.OverlapSphere(this.transform.position, Range);
+
+            int i = 0;
+            while (i < hitColliders.Length)
             {
-                //already send message to ennemy no need to spam him :) 
-                if (!enemies.Contains(hitColliders[i]))
+                if (hitColliders[i].tag.Equals("Enemy"))
                 {
-                    Debug.Log("Player - Enemy added to list");
-                    enemies.Add(hitColliders[i]);
-                    hitColliders[i].gameObject.SendMessage("MarkTarget", this.gameObject);
+                    //already send message to ennemy no need to spam him :) 
+                    if (!Enemies.Contains(hitColliders[i]))
+                    {
+                        Enemies.Add(hitColliders[i]);
+                        hitColliders[i].gameObject.SendMessage("MarkTarget", this.gameObject);
+                    }
                 }
+                i++;
             }
-            i++;
+            yield return new WaitForSeconds(Constants.CAST_AGGRO_FREQUENCY);
+
         }
-        yield return new WaitForSeconds(Constants.CAST_AGGRO_FREQUENCY);
     }
 
+    protected override GameObject GetTarget()
+    {
+        return Target;
+    }
+
+    protected override NavMeshAgent GetAgent()
+    {
+        return Agent;
+    }
 }

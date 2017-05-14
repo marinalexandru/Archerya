@@ -2,31 +2,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : GameCombatantUnit
 {
-
-
-    [HeaderAttribute("Attack:")]
-    public float baseAttackSpeed = 1.0f; // attacks per second 
-    public float range = 5.0f;
-	[HeaderAttribute("Agro:")]
-    public float agroRange = 10.0f;
-    [HeaderAttribute("3DParts")]
-    public GameObject weapon;
-    public GameObject hitZone;
-    private GameObject target;
-    private UnityEngine.AI.NavMeshAgent agent;
+    public float FollowAgroRange = 20f;
+    private UnityEngine.AI.NavMeshAgent Agent;
+    private GameObject Target;
     // Use this for initialization
     void Start()
     {
-        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
     }
 
     // Update is called once per frame
-    void Update()
+    public override void Update()
     {
-        ShouldAttackTarget(); //if has target
+        base.Update();
+        ShouldFollowAgroedEnemy(); //if in range
+    }
+
+
+    private void ShouldFollowAgroedEnemy()
+    {
+
+        if (Target == null)
+        {
+            return;
+        }
+
+        if (Vector3.Distance(this.transform.position, Target.transform.position) >= FollowAgroRange)
+        {
+            Agent.ResetPath();
+            this.Target.SendMessage("OnEnemyDeadOrFlee", this.GetComponent<Collider>());
+            Target = null;
+        }
     }
 
 
@@ -35,62 +45,27 @@ public class EnemyController : MonoBehaviour
     /// </summary>
     void OnDestroy()
     {
-        if (this.target != null)
+        if (this.Target != null)
         {
-            this.target.SendMessage("OnEnemyDeadOrFlee", this.GetComponent<Collider>());
+            this.Target.SendMessage("OnEnemyDeadOrFlee", this.GetComponent<Collider>());
         }
     }
-
-
-    private void ShouldAttackTarget()
-    {
-        if (target == null)
-        {
-            return;
-        }
-        if (Vector3.Distance(target.transform.position, transform.position) > agroRange)
-        {
-			this.target.SendMessage("OnEnemyDeadOrFlee", this.GetComponent<Collider>());
-            this.target = null;
-			agent.SetDestination(this.transform.position);
-            return;
-        }
-
-		if (Vector3.Distance(this.transform.position, target.transform.position) <= range)
-        {
-            // stop movement because we can attack
-            agent.SetDestination(this.transform.position);
-            AutoAttack();
-        }
-        else
-        {
-            // follow enemy
-            agent.SetDestination(target.transform.position);
-        }
-    }
-
-    private void AutoAttack()
-    {
-        //face the enemy
-        // transform.LookAt(enemyTarget); // not interpolated -> bad
-
-        //using quaternions
-        Vector3 distanceVector = target.transform.position - transform.position;
-        Quaternion targetRotation = Quaternion.LookRotation(distanceVector);
-        Quaternion stepRotation = Quaternion.Slerp(transform.rotation, targetRotation,
-                            Constants.ANGULAR_LOCK_IN_SPEED * Time.deltaTime);
-        stepRotation.eulerAngles.Set(0, stepRotation.eulerAngles.y, 0);
-        transform.rotation = stepRotation;
-
-    }
-
 
     // This is called from Players that aggro 
     // this is basically the aggro function that should trigger an attack
     public void MarkTarget(GameObject target)
     {
-        this.target = target;
+        this.Target = target;
         Debug.Log("Enemy - Will attack target");
     }
 
+    protected override GameObject GetTarget()
+    {
+        return Target;
+    }
+
+    protected override NavMeshAgent GetAgent()
+    {
+        return Agent;
+    }
 }
