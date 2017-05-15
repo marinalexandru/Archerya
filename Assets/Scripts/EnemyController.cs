@@ -15,7 +15,7 @@ public class EnemyController : GameCombatantController
     // Update is called once per frame
     public override void Update()
     {
-        // base.Update();
+        base.Update();
         ShouldFollowAgroedEnemy(); //if in range
     }
 

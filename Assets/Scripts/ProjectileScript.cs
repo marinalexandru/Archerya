@@ -3,13 +3,21 @@
 public class ProjectileScript : MonoBehaviour
 {
 
-    public GameObject ProjectileTarget;
-    public float Speed = 0;
+    private GameObject ProjectileTarget;
+    private float Speed = 0;
+
+    public void SetTarget(GameObject ProjectileTarget){
+        this.ProjectileTarget = ProjectileTarget;
+    }
+
+    public void SetSpeed(float Speed){
+        this.Speed = Speed;
+    }
 
     // Use this for initialization
     void Start()
     {
-        ProjectileTarget = null;
+        
     }
 
     // Update is called once per frame

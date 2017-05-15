@@ -56,50 +56,19 @@ public abstract class GameCombatantController : MonoBehaviour
 
     private void AutoAttack()
     {
-        // if (AutoAttacking)
-        // {
-        //     return;
-        // }
-        // StartCoroutine(AutoAttackCoroutine());
-        // AutoAttacking = true;
-
         timer = timer + Time.deltaTime;
-
         if (timer > 1 / BaseAttackSpeed)
         {
             if (CanShootTarget())
             {
-                Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
-                ProjectileScript projectileScript = Projectile.GetComponent<ProjectileScript>();
+                GameObject gameObject=Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
                 GameCombatantController gameCombatantController = GetTarget().gameObject.GetComponent<GameCombatantController>();
-                projectileScript.ProjectileTarget = gameCombatantController.HitZone;
-                Debug.DrawLine(this.HitZone.transform.position, gameCombatantController.HitZone.transform.position, Color.green,0.25f);                
-                Projectile.GetComponent<ProjectileScript>().Speed = 50;
+                gameObject.SendMessage("SetTarget",gameCombatantController.HitZone, SendMessageOptions.RequireReceiver);
+                gameObject.SendMessage("SetSpeed",20, SendMessageOptions.RequireReceiver);
             }
             timer = 0;
         }
     }
-
-
-    // private IEnumerator AutoAttackCoroutine()
-    // {
-    //     while (true)
-    //     {
-    //         if (CanShootTarget())
-    //         {
-    //             Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
-    //             ProjectileScript projectileScript = Projectile.GetComponent<ProjectileScript>();
-    //             GameCombatantController gameCombatantController = GetTarget().gameObject.GetComponent<GameCombatantController>();
-    //             projectileScript.ProjectileTarget = gameCombatantController.HitZone;
-    //             Projectile.GetComponent<ProjectileScript>().Speed = 30;
-    //         }
-    //         else
-    //         {
-    //             StopCoroutine(AutoAttackCoroutine());
-    //         }
-    //         yield return new WaitForSeconds(1 / BaseAttackSpeed);
-    //     }
-    // }
 
     private bool CanShootTarget()
     {
