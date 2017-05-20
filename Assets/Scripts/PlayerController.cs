@@ -11,6 +11,8 @@ public class PlayerController : GameCombatantController
     private List<Collider> Enemies;
     private GameObject Target;
     private bool agroScanCoroutineStarted = false;
+    PlayerAnnimationController PlayerAnnimationController;
+
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
@@ -21,6 +23,7 @@ public class PlayerController : GameCombatantController
         Camera = Camera.main;
         Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         Enemies = new List<Collider>();
+        PlayerAnnimationController = GetComponent<PlayerAnnimationController>();
     }
 
     /// <summary>
@@ -30,8 +33,12 @@ public class PlayerController : GameCombatantController
     {
         base.Update();
         ShouldUpdateTarget(); //if clicked
-        ShouldTalkToFriend(); //if friend targeted
         ShouldGetAggroOfEnemy(); //if enemys are near 
+
+        if (AgentReachedDestination())
+        {
+            PlayerAnnimationController.AnimateIdle();
+        }
     }
 
     private void ShouldUpdateTarget()
@@ -62,13 +69,9 @@ public class PlayerController : GameCombatantController
                 Target = null;
                 FriendlyTarget = null;
                 Agent.SetDestination(hit.point);
+                PlayerAnnimationController.AnimateMove();
                 break;
         }
-    }
-
-    private void ShouldTalkToFriend()
-    {
-
     }
 
     private void ShouldGetAggroOfEnemy()
@@ -113,6 +116,21 @@ public class PlayerController : GameCombatantController
             yield return new WaitForSeconds(Constants.CAST_AGGRO_FREQUENCY);
 
         }
+    }
+
+    public bool AgentReachedDestination()
+    {
+        if (!Agent.pathPending)
+        {
+            if (Agent.remainingDistance <= Agent.stoppingDistance)
+            {
+                if (!Agent.hasPath || Agent.velocity.sqrMagnitude == 0f)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     protected override GameObject GetTarget()
