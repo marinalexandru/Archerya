@@ -17,6 +17,11 @@ public class PlayerAnnimationController : MonoBehaviour
 		playerAnimator = model.GetComponent<Animator>();
 	}
 
+    void Update()
+    {
+        
+    }
+
     public void AnimateMove()
     {
         playerAnimator.SetBool("isWalking", true);
