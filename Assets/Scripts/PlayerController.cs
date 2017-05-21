@@ -7,10 +7,8 @@ public class PlayerController : GameCombatantController
 {
     private UnityEngine.AI.NavMeshAgent Agent;
     private Camera Camera;
-    private GameObject FriendlyTarget;
-    private List<Collider> Enemies;
+    // private List<Collider> Enemies;
     private GameObject Target;
-    private bool agroScanCoroutineStarted = false;
     PlayerAnnimationController PlayerAnnimationController;
 
 
@@ -22,7 +20,7 @@ public class PlayerController : GameCombatantController
     {
         Camera = Camera.main;
         Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        Enemies = new List<Collider>();
+
         PlayerAnnimationController = GetComponent<PlayerAnnimationController>();
     }
 
@@ -33,7 +31,6 @@ public class PlayerController : GameCombatantController
     {
         base.Update();
         ShouldUpdateTarget(); //if clicked
-        ShouldGetAggroOfEnemy(); //if enemys are near 
 
         if (AgentReachedDestination())
         {
@@ -55,67 +52,17 @@ public class PlayerController : GameCombatantController
 
     private void MarkTargets(RaycastHit hit)
     {
-        switch (hit.transform.gameObject.tag)
+        if (hit.transform.gameObject.tag.Equals("Enemy"))
         {
-            case "Enemy":
-                Target = hit.transform.gameObject;
-                FriendlyTarget = null;
-                break;
-            case "Friend":
-                FriendlyTarget = hit.transform.gameObject;
-                Target = null;
-                break;
-            default:
-                Target = null;
-                FriendlyTarget = null;
-                Agent.SetDestination(hit.point);
-                PlayerAnnimationController.AnimateMove();
-                break;
+            Target = hit.transform.gameObject;
         }
-    }
-
-    private void ShouldGetAggroOfEnemy()
-    {
-        if (!agroScanCoroutineStarted)
+        else
         {
-            StartCoroutine(AggroScanCoroutine());
-            agroScanCoroutineStarted = true;
+            Target = null;
+            Agent.SetDestination(hit.point);
+            PlayerAnnimationController.AnimateMove();
         }
-    }
 
-
-    // this is called by an attacking enemy on demise or on flee
-    public void OnEnemyDeadOrFlee(Collider collider)
-    {
-        Enemies.Remove(collider);
-        Debug.Log("Player - Enemy removed from list. Size is: " + Enemies.Count);
-    }
-
-    private IEnumerator AggroScanCoroutine()
-    {
-        //todo try InvokeRepeating also
-        while (true)
-        {
-
-            Collider[] hitColliders = Physics.OverlapSphere(this.transform.position, Range);
-
-            int i = 0;
-            while (i < hitColliders.Length)
-            {
-                if (hitColliders[i].tag.Equals("Enemy"))
-                {
-                    //already send message to ennemy no need to spam him :) 
-                    if (!Enemies.Contains(hitColliders[i]))
-                    {
-                        Enemies.Add(hitColliders[i]);
-                        hitColliders[i].gameObject.SendMessage("MarkTarget", this.gameObject);
-                    }
-                }
-                i++;
-            }
-            yield return new WaitForSeconds(Constants.CAST_AGGRO_FREQUENCY);
-
-        }
     }
 
     public bool AgentReachedDestination()
