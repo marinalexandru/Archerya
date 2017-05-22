@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,5 +33,11 @@ public class PlayerAnnimationController : MonoBehaviour
     {
         playerAnimator.SetBool("isWalking", false);
         playerAnimator.SetBool("isAttacking", false);
+    }
+
+    internal void AnimateAttack()
+    {
+        playerAnimator.SetBool("isWalking", false);
+        playerAnimator.SetBool("isAttacking", true);
     }
 }

@@ -9,12 +9,11 @@ public class ShooterController : MonoBehaviour
     public GameObject Projectile;
     [HeaderAttribute("Attack:")]
     public float Range = 5.0f;
-    public float BaseAttackSpeed = 1.0f; // attacks per second 
+    public float BaseAttackSpeed = 1.0f; // attacks per second
     private bool AutoAttacking = false;
     private float timer = 0;
     private NavMeshAgent Agent;
     private GameObject Target;
-
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
@@ -52,6 +51,11 @@ public class ShooterController : MonoBehaviour
         this.Target = Target;
     }
 
+    public void ShootSpell()
+    {
+        ShootProjectile(Projectile);
+    }
+
     private void RotateTowardsTarget()
     {
         Vector3 distanceVector = Target.transform.position - transform.position;
@@ -69,13 +73,19 @@ public class ShooterController : MonoBehaviour
         {
             if (CanShootTarget())
             {
-                GameObject gameObject = Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
-                ShooterController gameCombatantController = Target.gameObject.GetComponent<ShooterController>();
-                gameObject.SendMessage("SetTarget", gameCombatantController.HitZone, SendMessageOptions.RequireReceiver);
-                gameObject.SendMessage("SetSpeed", 20, SendMessageOptions.RequireReceiver);
+                ShootProjectile(Projectile);
             }
             timer = 0;
         }
+    }
+
+    private void ShootProjectile(GameObject Projectile)
+    {
+        GameObject projectileReference = Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
+        ShooterController gameCombatantController = Target.gameObject.GetComponent<ShooterController>();
+        projectileReference.SendMessage("SetTarget", gameCombatantController.HitZone, SendMessageOptions.RequireReceiver);
+        projectileReference.SendMessage("SetSpeed", 20, SendMessageOptions.RequireReceiver);
+
     }
 
     private bool CanShootTarget()

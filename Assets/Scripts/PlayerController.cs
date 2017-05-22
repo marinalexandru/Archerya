@@ -12,8 +12,6 @@ public class PlayerController : MonoBehaviour
     private PlayerAnnimationController PlayerAnnimationController;
     private ShooterController ShooterController;
 
-
-
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
     /// any of the Update methods is called the first time.
@@ -40,10 +38,18 @@ public class PlayerController : MonoBehaviour
                 MarkTargets(hit);
             }
         }
-
-        if (AgentReachedDestination())
+        if (Input.GetKeyDown("space")){
+            ShooterController.ShootSpell();
+        }
+        if (AgentReachedDestination() && Target == null)
         {
             PlayerAnnimationController.AnimateIdle();
+        }
+        if (AgentReachedDestination() && Target != null){
+            PlayerAnnimationController.AnimateAttack();
+        }
+        if (!AgentReachedDestination() && Target != null){
+            PlayerAnnimationController.AnimateMove();
         }
     }
 
@@ -59,7 +65,6 @@ public class PlayerController : MonoBehaviour
             Agent.SetDestination(hit.point);
             PlayerAnnimationController.AnimateMove();
         }
-
     }
 
     public bool AgentReachedDestination()
