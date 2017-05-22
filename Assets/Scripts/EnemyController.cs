@@ -1,34 +1,25 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyController : GameCombatantController
+public class EnemyController : MonoBehaviour
 {
     public float FollowAgroRange = 20f;
     private UnityEngine.AI.NavMeshAgent Agent;
     private GameObject Target;
+    private ShooterController ShooterController;
+
     // Use this for initialization
     void Start()
     {
         Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        ShooterController = GetComponent<ShooterController>();
     }
 
     // Update is called once per frame
-    public override void Update()
+    public void Update()
     {
-        base.Update();
-        ShouldFollowAgroedEnemy(); //if in range
-    }
-
-
-    private void ShouldFollowAgroedEnemy()
-    {
-
-        if (Target == null)
-        {
-            return;
-        }
-
-        if (Vector3.Distance(this.transform.position, Target.transform.position) >= FollowAgroRange)
+        ShooterController.SetTarget(Target);
+        if (Target != null && Vector3.Distance(this.transform.position, Target.transform.position) >= FollowAgroRange)
         {
             Agent.ResetPath();
             this.Target.SendMessage("OnEnemyDeadOrFlee", this.GetComponent<Collider>());
@@ -56,13 +47,4 @@ public class EnemyController : GameCombatantController
         Debug.Log("Enemy - Will attack target");
     }
 
-    protected override GameObject GetTarget()
-    {
-        return Target;
-    }
-
-    protected override NavMeshAgent GetAgent()
-    {
-        return Agent;
-    }
 }

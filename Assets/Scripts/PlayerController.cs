@@ -3,13 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
-public class PlayerController : GameCombatantController
+public class PlayerController : MonoBehaviour
 {
     private UnityEngine.AI.NavMeshAgent Agent;
     private Camera Camera;
     // private List<Collider> Enemies;
     private GameObject Target;
-    PlayerAnnimationController PlayerAnnimationController;
+    private PlayerAnnimationController PlayerAnnimationController;
+    private ShooterController ShooterController;
+
 
 
     /// <summary>
@@ -20,26 +22,16 @@ public class PlayerController : GameCombatantController
     {
         Camera = Camera.main;
         Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-
         PlayerAnnimationController = GetComponent<PlayerAnnimationController>();
+        ShooterController = GetComponent<ShooterController>();
     }
 
     /// <summary>
     /// Update is called every frame, if the MonoBehaviour is enabled.
     /// </summary>
-    public override void Update()
+    public void Update()
     {
-        base.Update();
-        ShouldUpdateTarget(); //if clicked
-
-        if (AgentReachedDestination())
-        {
-            PlayerAnnimationController.AnimateIdle();
-        }
-    }
-
-    private void ShouldUpdateTarget()
-    {
+        ShooterController.SetTarget(Target);
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
@@ -47,6 +39,11 @@ public class PlayerController : GameCombatantController
             {
                 MarkTargets(hit);
             }
+        }
+
+        if (AgentReachedDestination())
+        {
+            PlayerAnnimationController.AnimateIdle();
         }
     }
 
@@ -80,13 +77,4 @@ public class PlayerController : GameCombatantController
         return false;
     }
 
-    protected override GameObject GetTarget()
-    {
-        return Target;
-    }
-
-    protected override NavMeshAgent GetAgent()
-    {
-        return Agent;
-    }
 }
