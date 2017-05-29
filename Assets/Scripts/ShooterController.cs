@@ -73,7 +73,7 @@ public class ShooterController : MonoBehaviour
         {
             if (CanShootTarget())
             {
-                ShootProjectile(Projectile);
+                // ShootProjectile(Projectile);
             }
             timer = 0;
         }

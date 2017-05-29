@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.AI;
+using System;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, PlayerAnnimationController.PlayerAnimationCallbacks
 {
     private UnityEngine.AI.NavMeshAgent Agent;
     private Camera Camera;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
         Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         PlayerAnnimationController = GetComponent<PlayerAnnimationController>();
         ShooterController = GetComponent<ShooterController>();
+        PlayerAnnimationController.SetAnimationCallbacks(this);
     }
 
     /// <summary>
@@ -82,4 +84,13 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
+    void PlayerAnnimationController.PlayerAnimationCallbacks.OnProjectileShouldCreate()
+    {
+        
+    }
+
+    void PlayerAnnimationController.PlayerAnimationCallbacks.OnProjectileShouldFire()
+    {
+        ShooterController.ShootSpell();
+    }
 }
