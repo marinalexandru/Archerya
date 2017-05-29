@@ -11,14 +11,13 @@ public class PlayerAttackBehaviour : StateMachineBehaviour
     public event OnProjectileFire OnProjectileFireEvent;
     public delegate void OnProjectileAttackStarted();
     public delegate void OnProjectileFire();
-	public bool ActionDelegated = false;
+	private bool ActionDelegated = false;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         InitialSpeed = animator.speed;
-        animator.speed = 0.5f;
-		ActionDelegated = false;
+        animator.speed = 1.5f;
         if (OnProjectileAttackStartedEvent != null)
         {
             OnProjectileAttackStartedEvent();
@@ -28,15 +27,19 @@ public class PlayerAttackBehaviour : StateMachineBehaviour
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        float totalDuration = stateInfo.length;
-        float actualDuration = stateInfo.normalizedTime % 1;
-        if (totalDuration / 2 < actualDuration && !ActionDelegated)
+        float normalisedDuration = stateInfo.normalizedTime % 1;
+        if (normalisedDuration > 0.4f && !ActionDelegated)
         {
 			ActionDelegated = true;
             if (OnProjectileFireEvent != null)
             {
                 OnProjectileFireEvent();
             }
+        }
+
+        if (normalisedDuration <0.4f)
+        {
+            ActionDelegated = false;
         }
     }
 
