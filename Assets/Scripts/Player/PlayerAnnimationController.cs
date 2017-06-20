@@ -13,7 +13,7 @@ public class PlayerAnnimationController : MonoBehaviour
     private Animator PlayerAnimator;
     private PlayerAnimationCallbacks AnimationCallbacks;
 	public GameObject model;
-    private PlayerAttackBehaviour PlayerAttackBehaviour;
+    private AttackBehaviour AttackBehaviour;
 
 	public /// <summary>
 	/// Start is called on the frame when a script is enabled just before
@@ -22,9 +22,9 @@ public class PlayerAnnimationController : MonoBehaviour
 	void Start()
 	{
 		PlayerAnimator = model.GetComponent<Animator>();
-        PlayerAttackBehaviour = PlayerAnimator.GetBehaviour<PlayerAttackBehaviour>();
-        PlayerAttackBehaviour.OnProjectileAttackStartedEvent += OnProjectileShouldBeInstantiated;
-        PlayerAttackBehaviour.OnProjectileFireEvent += OnProjectileShouldBeFired;
+        AttackBehaviour = PlayerAnimator.GetBehaviour<AttackBehaviour>();
+        AttackBehaviour.OnProjectileAttackStartedEvent += OnProjectileShouldBeInstantiated;
+        AttackBehaviour.OnProjectileFireEvent += OnProjectileShouldBeFired;
 	}
 
     /// <summary>
@@ -32,8 +32,8 @@ public class PlayerAnnimationController : MonoBehaviour
     /// </summary>
     void OnDestroy()
     {
-        PlayerAttackBehaviour.OnProjectileAttackStartedEvent -= OnProjectileShouldBeInstantiated;
-        PlayerAttackBehaviour.OnProjectileFireEvent -= OnProjectileShouldBeFired;
+        AttackBehaviour.OnProjectileAttackStartedEvent -= OnProjectileShouldBeInstantiated;
+        AttackBehaviour.OnProjectileFireEvent -= OnProjectileShouldBeFired;
         AnimationCallbacks = null;
     }
 

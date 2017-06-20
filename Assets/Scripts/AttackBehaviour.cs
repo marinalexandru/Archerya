@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
 
-public class PlayerAttackBehaviour : StateMachineBehaviour
+public class AttackBehaviour : StateMachineBehaviour
 {
 
     private float InitialSpeed = 0f;
@@ -11,36 +11,50 @@ public class PlayerAttackBehaviour : StateMachineBehaviour
     public event OnProjectileFire OnProjectileFireEvent;
     public delegate void OnProjectileAttackStarted();
     public delegate void OnProjectileFire();
-	private bool ActionDelegated = false;
+    private bool OnProjectileFireActionDelegated = false;
+    private bool OnProjectileAttackStartedDelegated = false;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         InitialSpeed = animator.speed;
-        animator.speed = 1.5f;
-        if (OnProjectileAttackStartedEvent != null)
-        {
-            OnProjectileAttackStartedEvent();
-        }
+        animator.speed = 0.5f;
+
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         float normalisedDuration = stateInfo.normalizedTime % 1;
-        if (normalisedDuration > 0.4f && !ActionDelegated)
+        if (normalisedDuration > 0.4f && !OnProjectileFireActionDelegated)
         {
-			ActionDelegated = true;
+            OnProjectileFireActionDelegated = true;
             if (OnProjectileFireEvent != null)
             {
                 OnProjectileFireEvent();
             }
         }
 
-        if (normalisedDuration <0.4f)
+        if (normalisedDuration < 0.4f)
         {
-            ActionDelegated = false;
+            OnProjectileFireActionDelegated = false;
         }
+
+        if (normalisedDuration > 0.1f && !OnProjectileAttackStartedDelegated)
+        {
+            OnProjectileAttackStartedDelegated = true;
+            if (OnProjectileAttackStartedEvent != null)
+            {
+                OnProjectileAttackStartedEvent();
+            }
+        }
+
+        if (normalisedDuration < 0.1f)
+        {
+            OnProjectileAttackStartedDelegated = false;
+        }
+
+
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
