@@ -18,7 +18,7 @@ public class AttackBehaviour : StateMachineBehaviour
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         InitialSpeed = animator.speed;
-        animator.speed = 0.5f;
+        animator.speed = 2f;
 
     }
 
