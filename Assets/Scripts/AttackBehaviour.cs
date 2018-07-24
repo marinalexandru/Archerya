@@ -6,19 +6,20 @@ using UnityEngine;
 public class AttackBehaviour : StateMachineBehaviour
 {
 
-    private float InitialSpeed = 0f;
+    float InitialSpeed = 0f;
     public event OnProjectileAttackStarted OnProjectileAttackStartedEvent;
     public event OnProjectileFire OnProjectileFireEvent;
     public delegate void OnProjectileAttackStarted();
     public delegate void OnProjectileFire();
-    private bool OnProjectileFireActionDelegated = false;
-    private bool OnProjectileAttackStartedDelegated = false;
+    float attackSpeed;
+    bool OnProjectileFireActionDelegated = false;
+    bool OnProjectileAttackStartedDelegated = false;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         InitialSpeed = animator.speed;
-        animator.speed = 0.5f;
+        animator.speed = attackSpeed;
 
     }
 
@@ -54,7 +55,10 @@ public class AttackBehaviour : StateMachineBehaviour
             OnProjectileAttackStartedDelegated = false;
         }
 
+    }
 
+    public void SetAttackSpeed(float attackSpeed){
+        this.attackSpeed = attackSpeed;
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state

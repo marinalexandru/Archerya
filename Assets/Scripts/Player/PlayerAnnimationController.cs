@@ -13,6 +13,7 @@ public class PlayerAnnimationController : MonoBehaviour
     private Animator PlayerAnimator;
     private PlayerAnimationCallbacks AnimationCallbacks;
 	public GameObject model;
+    public float attackSpeed;
     private AttackBehaviour AttackBehaviour;
 
 	public /// <summary>
@@ -23,6 +24,7 @@ public class PlayerAnnimationController : MonoBehaviour
 	{
 		PlayerAnimator = model.GetComponent<Animator>();
         AttackBehaviour = PlayerAnimator.GetBehaviour<AttackBehaviour>();
+        AttackBehaviour.SetAttackSpeed(attackSpeed);
         AttackBehaviour.OnProjectileAttackStartedEvent += OnProjectileShouldBeInstantiated;
         AttackBehaviour.OnProjectileFireEvent += OnProjectileShouldBeFired;
 	}

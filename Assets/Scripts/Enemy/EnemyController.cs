@@ -41,7 +41,7 @@ public class EnemyController : MonoBehaviour
 
     // This is called from Players that aggro 
     // this is basically the aggro function that should trigger an attack
-    public void MarkTarget(GameObject target)
+    public void FollowTarget(GameObject target)
     {
         this.Target = target;
         Debug.Log("Enemy - Will attack target");

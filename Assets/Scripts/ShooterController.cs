@@ -9,11 +9,8 @@ public class ShooterController : MonoBehaviour
     public GameObject Projectile;
     [HeaderAttribute("Attack:")]
     public float Range = 5.0f;
-    public float BaseAttackSpeed = 1.0f; // attacks per second
-    private bool AutoAttacking = false;
-    private float timer = 0;
-    private NavMeshAgent Agent;
-    private GameObject Target;
+    NavMeshAgent Agent;
+    GameObject Target;
 
     /// <summary>
     /// Start is called on the frame when a script is enabled just before
@@ -36,7 +33,6 @@ public class ShooterController : MonoBehaviour
                 // stop movement because we can attack
                 Agent.ResetPath();
                 RotateTowardsTarget();
-                AutoAttack();
             }
             else
             {
@@ -53,10 +49,10 @@ public class ShooterController : MonoBehaviour
 
     public void ShootSpell()
     {
-        ShootProjectile(Projectile);
+        ShootProjectile();
     }
 
-    private void RotateTowardsTarget()
+    void RotateTowardsTarget()
     {
         Vector3 distanceVector = Target.transform.position - transform.position;
         Quaternion targetRotation = Quaternion.LookRotation(distanceVector);
@@ -66,20 +62,7 @@ public class ShooterController : MonoBehaviour
         transform.rotation = stepRotation;
     }
 
-    private void AutoAttack()
-    {
-        timer = timer + Time.deltaTime;
-        if (timer > 1 / BaseAttackSpeed)
-        {
-            if (CanShootTarget())
-            {
-                // ShootProjectile(Projectile);
-            }
-            timer = 0;
-        }
-    }
-
-    private void ShootProjectile(GameObject Projectile)
+    void ShootProjectile()
     {
         GameObject projectileReference = Instantiate(Projectile, Weapon.transform.position, Weapon.transform.rotation);
         ShooterController gameCombatantController = Target.gameObject.GetComponent<ShooterController>();
@@ -88,16 +71,13 @@ public class ShooterController : MonoBehaviour
 
     }
 
-    private bool CanShootTarget()
+    bool CanShootTarget()
     {
         if (Target != null && Vector3.Distance(this.transform.position, Target.transform.position) <= Range)
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
 }

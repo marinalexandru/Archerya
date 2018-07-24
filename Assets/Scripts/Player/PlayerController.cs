@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour, PlayerAnnimationController.Player
 {
     private UnityEngine.AI.NavMeshAgent Agent;
     private Camera Camera;
-    // private List<Collider> Enemies;
     private GameObject Target;
     private PlayerAnnimationController PlayerAnnimationController;
     private ShooterController ShooterController;
@@ -40,9 +39,6 @@ public class PlayerController : MonoBehaviour, PlayerAnnimationController.Player
                 MarkTargets(hit);
             }
         }
-        if (Input.GetKeyDown("space")){
-            ShooterController.ShootSpell();
-        }
         if (AgentReachedDestination() && Target == null)
         {
             PlayerAnnimationController.AnimateIdle();
@@ -55,7 +51,7 @@ public class PlayerController : MonoBehaviour, PlayerAnnimationController.Player
         }
     }
 
-    private void MarkTargets(RaycastHit hit)
+    void MarkTargets(RaycastHit hit)
     {
         if (hit.transform.gameObject.tag.Equals("Enemy"))
         {
@@ -75,7 +71,7 @@ public class PlayerController : MonoBehaviour, PlayerAnnimationController.Player
         {
             if (Agent.remainingDistance <= Agent.stoppingDistance)
             {
-                if (!Agent.hasPath || Agent.velocity.sqrMagnitude == 0f)
+                if (!Agent.hasPath || Agent.velocity.sqrMagnitude == 0)
                 {
                     return true;
                 }

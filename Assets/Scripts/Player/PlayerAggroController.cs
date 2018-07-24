@@ -34,7 +34,6 @@ public class PlayerAggroController : MonoBehaviour
 
     private IEnumerator AggroScanCoroutine()
     {
-        //todo try InvokeRepeating also
         while (true)
         {
             Collider[] hitColliders = Physics.OverlapSphere(this.transform.position, AggroRange);
@@ -43,11 +42,10 @@ public class PlayerAggroController : MonoBehaviour
             {
                 if (hitColliders[i].tag.Equals("Enemy"))
                 {
-                    //already send message to ennemy no need to spam him :) 
                     if (!Enemies.Contains(hitColliders[i]))
                     {
                         Enemies.Add(hitColliders[i]);
-                        hitColliders[i].gameObject.SendMessage("MarkTarget", this.gameObject);
+                        hitColliders[i].gameObject.GetComponent<EnemyController>().FollowTarget(this.gameObject);
                     }
                 }
                 i++;
